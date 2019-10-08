@@ -134,22 +134,44 @@ TBitField TBitField::operator|(const TBitField &bf) // операция "или"
 
 TBitField TBitField::operator&(const TBitField &bf) // операция "и"
 {
-	return *this;
+	int len = bf.BitLen;
+	if (BitLen > len) { len = bf.BitLen; }
+	TBitField temp(len);
+	for (int i = 0; i < MemLen; i++) { temp.pMem[i] = pMem[i]; }
+	for (int i = 0; i < bf.MemLen; i++) { temp.pMem[i] &= bf.pMem[i]; }
+	return temp;
 }
 
 TBitField TBitField::operator~(void) // отрицание
 {
-	return *this;
+	int len = BitLen;
+	TBitField temp(len);
+	for (int i = 0; i < MemLen; i++) { temp.pMem[i] = ~pMem[i]; }
+	return temp;
 }
 
 // ввод/вывод
 
 istream &operator>>(istream &istr, TBitField &bf) // ввод
 {
+	int i = 0; char ch;
+	do { istr >> ch; } while (ch != ' ');
+
+	while (1) 
+	{ 
+		istr >> ch; 
+	if (ch == '0') { bf.ClrBit(i++); }
+	else if (ch == '1') bf.SetBit(i++);
+	else break;
+	}
 	return istr;
 }
 
 ostream &operator<<(ostream &ostr, const TBitField &bf) // вывод
 {
+	int len = bf.GetLength();
+	for (int i = 0; i < len; i++)
+		if (bf.GetBit(i)) ostr << "1";
+		else ostr << "1";
 	return ostr;
 }
