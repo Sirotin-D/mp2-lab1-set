@@ -9,16 +9,19 @@
 
 TBitField::TBitField(int len) : BitLen (len)
 {
-	MemLen = (len + 31) >> 5;
-	pMem = new TELEM(MemLen);
-	if (pMem != NULL)
-	{
-		for (int i = 0; i < MemLen; i++) pMem[i] = 0;
+	if (len > -1) {
+		MemLen = (len + 31) >> 5;
+		pMem = new TELEM[MemLen];
+		if (pMem != NULL)
+		{
+			for (int i = 0; i < MemLen; i++) pMem[i] = 0;
+		}
+		else
+		{
+			throw - 1;
+		}
 	}
-	else
-	{
-		throw -1;
-	}
+	else throw - 3;
 }
 
 TBitField::TBitField(const TBitField &bf) // конструктор копирования
@@ -41,13 +44,29 @@ TBitField::~TBitField()
 
 int TBitField::GetMemIndex(const int n) const // индекс Мем для бита n
 {
+	if ((n > -1) && (n < BitLen))
+	{
+		int res = n >> 5;
+		return res;
+	}
+	else
+	{
+		throw - 1;
+	}
 
-	return n >> 5;
 }
 
 TELEM TBitField::GetMemMask(const int n) const // битовая маска для бита n
 {
-	return 1 << (n & 31);
+	if ((n > -1) && (n < BitLen))
+	{
+		int res = 1 << (n & 31);
+		return res;
+	}
+	else
+	{
+		throw - 1;
+	}
 }
 
 // доступ к битам битового поля
@@ -59,20 +78,20 @@ int TBitField::GetLength(void) const // получить длину (к-во б�
 
 void TBitField::SetBit(const int n) // установить бит
 {
-	if ((n > 1) && (n < BitLen))
+	if ((n > -1) && (n < BitLen))
 	{
 		pMem [GetMemIndex(n)] |= GetMemMask(n);
 	}
-		else
+	else
 	{
-		throw -3;
+	throw -3;
 	}
 }
 
 void TBitField::ClrBit(const int n) // очистить бит
 {
 	if ((n > -1) && (n < BitLen))
-		pMem[GetMemIndex(n)] &= GetMemMask(n);
+		pMem [GetMemIndex(n)] &= ~GetMemMask(n);
 	else
 	{
 		throw -3;
@@ -83,7 +102,7 @@ int TBitField::GetBit(const int n) const // получить значение б
 {
 	if ((n > -1) && (n < BitLen))
 		return pMem[GetMemIndex(n)] & GetMemMask(n);
-		else
+	else
 	{
 		throw - 3;
 	}
@@ -128,7 +147,7 @@ TBitField TBitField::operator|(const TBitField &bf) // операция "или"
 	if (bf.BitLen > len) len = bf.BitLen;
 	TBitField temp(len);
 	for (i = 0; i < MemLen; i++) temp.pMem[i] = pMem[i];
-	for (i = 0; i < bf.MemLen; i++) temp.pMem[i] = bf.pMem[i];
+	for (i = 0; i < bf.MemLen; i++) temp.pMem[i] |= bf.pMem[i];
 	return temp;
 }
 
