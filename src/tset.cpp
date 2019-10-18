@@ -73,7 +73,9 @@ TSet TSet::operator+(const TSet &s) // объединение
 
 TSet TSet::operator+(const int Elem) // объединение с элементом
 {
-	return *this;
+	TSet res(*this);
+	res.BitField.SetBit(Elem);
+	return res;
 }
 
 TSet TSet::operator-(const int Elem) // разность с элементом
